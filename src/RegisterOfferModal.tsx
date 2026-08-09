@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   X, Sparkles, Building2, Globe, Mail, DollarSign, Layers, Rocket,
-  CheckCircle2, ArrowRight, Star, ShieldCheck, Plus, Trash2,
+  CheckCircle2, ArrowRight, Star, ShieldCheck, Plus, Trash2, Coins,
 } from 'lucide-react'
 import { Offer, categories, types, lifecycles, addOffer } from './data'
 import { partnerIcon } from './icons'
@@ -24,6 +24,28 @@ const AVAILABLE_ICONS = [
   { id: 'table', label: 'Database / No-Code' },
 ]
 
+function HelpTooltip({ text }: { text: string }) {
+  const [show, setShow] = useState(false)
+  return (
+    <span
+      className="help-tip-wrap"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+      onClick={(e) => {
+        e.stopPropagation()
+        setShow(!show)
+      }}
+    >
+      <span className="help-tip-btn" aria-label="Help">?</span>
+      {show && (
+        <span className="help-tip-popover">
+          {text}
+        </span>
+      )}
+    </span>
+  )
+}
+
 export default function RegisterOfferModal({
   isOpen,
   onClose,
@@ -44,18 +66,18 @@ export default function RegisterOfferModal({
   const [contact, setContact] = useState(isAdmin ? '' : 'Jordan Reyes')
   const [icon, setIcon] = useState('sparkles')
 
-  // Offer fields
-  const [valueLabel, setValueLabel] = useState('$50,000 in platform credits')
-  const [usd, setUsd] = useState(50000)
+  // Offer fields in AED
+  const [aed, setAed] = useState(185000)
+  const [valueLabel, setValueLabel] = useState('AED 185,000 in credits')
   const [cat, setCat] = useState('build')
   const [type, setType] = useState<'Software' | 'Service' | 'Both'>('Software')
   const [lifecycle, setLifecycle] = useState('Product')
-  const [short, setShort] = useState('Cloud credits, dedicated technical support, and founder onboarding.')
+  const [short, setShort] = useState('Cloud compute, dedicated technical support, and founder onboarding.')
   const [about, setAbout] = useState('Access scalable cloud compute, storage, and developer APIs to accelerate your startup roadmap.')
   const [why, setWhy] = useState('Eliminates infrastructure cost bottlenecks so your engineering team can focus on shipping product.')
   const [whoFor, setWhoFor] = useState('Early and growth stage Hub71 startups with under $5M in external funding.')
   const [included, setIncluded] = useState<string[]>([
-    '$50,000 in platform usage credits for 12 months',
+    'AED 185,000 in platform usage credits for 12 months',
     '1-on-1 architecture review session with senior solutions architect',
     'Priority 24/7 developer support and onboarding guide',
   ])
@@ -77,10 +99,19 @@ export default function RegisterOfferModal({
     setIncluded(included.filter((_, i) => i !== idx))
   }
 
+  const handleAedChange = (val: number) => {
+    setAed(val)
+    if (!valueLabel || valueLabel.startsWith('AED ')) {
+      setValueLabel(`AED ${val.toLocaleString()} in credits`)
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const id = (partner || 'partner').toLowerCase().replace(/[^a-z0-9]/g, '') + '-' + Date.now().toString().slice(-4)
     const initials = partner.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() || 'HB'
+    const valueAED = Number(aed) || 10000
+    const usd = Math.round(valueAED / 3.67)
 
     const newOffer: Offer = {
       id,
@@ -90,9 +121,9 @@ export default function RegisterOfferModal({
       cat,
       type,
       lifecycle,
-      usd: Number(usd) || 10000,
-      valueLabel,
-      valueAED: Math.round((Number(usd) || 10000) * 3.67),
+      usd,
+      valueLabel: valueLabel || `AED ${valueAED.toLocaleString()}`,
+      valueAED,
       exclusive,
       short,
       about,
@@ -143,15 +174,15 @@ export default function RegisterOfferModal({
         }}
       >
         {/* Modal Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 26px', borderBottom: '1px solid var(--border)', background: 'var(--surface-2)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 24px', borderBottom: '1px solid var(--border)', background: 'var(--surface-2)' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
               <Building2 size={18} style={{ color: '#0066cc' }} />
-              <h2 style={{ fontSize: 17, fontWeight: 700, margin: 0, color: 'var(--text)' }}>
+              <h2 style={{ fontSize: 16.5, fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                 {isAdmin ? 'Register New Partner Perk Offer' : `Register Perk Offer for ${partner}`}
               </h2>
             </div>
-            <p style={{ fontSize: 12.5, color: 'var(--text-muted)', margin: '3px 0 0' }}>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
               {isAdmin
                 ? 'Onboard and publish a new partner offer to the Hub71 founder directory on behalf of a partner.'
                 : 'Publish a new startup perk offer to all founders in the Hub71 ecosystem.'}
@@ -164,16 +195,19 @@ export default function RegisterOfferModal({
 
         {/* Modal Body: Split Form + Live Card Preview */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 0, overflow: 'hidden', flex: 1 }}>
-          {/* Left: Scrollable Form */}
-          <form onSubmit={handleSubmit} style={{ overflowY: 'auto', padding: '24px 26px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {/* Left: Scrollable Minimalist Form */}
+          <form onSubmit={handleSubmit} style={{ overflowY: 'auto', padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
             {/* Section 1: Partner Information */}
             <div className="reg-section">
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Building2 size={14} /> 1. Partner Profile & Contact
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Building2 size={13} /> 1. Partner Profile & Contact
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div className="form-group">
-                  <label className="form-label">Partner / Company Name *</label>
+                  <label className="form-label">
+                    Partner / Company Name *
+                    <HelpTooltip text="Official registered entity or brand name." />
+                  </label>
                   {isAdmin ? (
                     <input
                       className="input"
@@ -188,7 +222,10 @@ export default function RegisterOfferModal({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Partner Website URL *</label>
+                  <label className="form-label">
+                    Partner Website URL *
+                    <HelpTooltip text="Link to partner homepage or dedicated startup portal." />
+                  </label>
                   <input
                     className="input"
                     required
@@ -199,7 +236,10 @@ export default function RegisterOfferModal({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Headquarters / Location</label>
+                  <label className="form-label">
+                    Headquarters / Location
+                    <HelpTooltip text="Primary office or operational hub location." />
+                  </label>
                   <input
                     className="input"
                     placeholder="e.g. Abu Dhabi, UAE"
@@ -209,11 +249,14 @@ export default function RegisterOfferModal({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Partner Representative Contact *</label>
+                  <label className="form-label">
+                    Partner Representative Contact *
+                    <HelpTooltip text="Lead representative handling founder access requests." />
+                  </label>
                   <input
                     className="input"
                     required
-                    placeholder="e.g. Sarah Jenkins (Head of Startups)"
+                    placeholder="e.g. Sarah Jenkins"
                     value={contact}
                     onChange={(e) => setContact(e.target.value)}
                   />
@@ -222,8 +265,11 @@ export default function RegisterOfferModal({
 
               {/* Logo / Icon Selector */}
               <div className="form-group" style={{ marginTop: 10 }}>
-                <label className="form-label">Partner Brand Icon</label>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+                <label className="form-label">
+                  Brand Icon
+                  <HelpTooltip text="Choose a symbol that best represents your tech stack or domain." />
+                </label>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
                   {AVAILABLE_ICONS.map((ico) => {
                     const I = partnerIcon(ico.id)
                     const active = icon === ico.id
@@ -234,16 +280,16 @@ export default function RegisterOfferModal({
                         onClick={() => setIcon(ico.id)}
                         className={'icon-btn' + (active ? ' saved' : '')}
                         style={{
-                          width: 36,
-                          height: 36,
-                          borderRadius: 10,
+                          width: 34,
+                          height: 34,
+                          borderRadius: 9,
                           border: active ? '1px solid #0066cc' : '1px solid var(--border)',
                           background: active ? 'color-mix(in srgb, #0066cc 15%, var(--surface))' : 'var(--surface-2)',
                           color: active ? '#0066cc' : 'var(--text)',
                         }}
                         title={ico.label}
                       >
-                        <I size={16} />
+                        <I size={15} />
                       </button>
                     )
                   })}
@@ -251,39 +297,48 @@ export default function RegisterOfferModal({
               </div>
             </div>
 
-            {/* Section 2: Offer Specifications */}
+            {/* Section 2: Offer Specifications in AED */}
             <div className="reg-section">
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <DollarSign size={14} /> 2. Offer Value & Classification
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Coins size={13} /> 2. Offer Value & Classification (AED)
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 12 }}>
                 <div className="form-group">
-                  <label className="form-label">Offer Headline / Value Label *</label>
+                  <label className="form-label">
+                    Offer Headline / Value Label *
+                    <HelpTooltip text="Prominent headline shown on the perk card (e.g. AED 185,000 in credits, 90% off year one)." />
+                  </label>
                   <input
                     className="input"
                     required
-                    placeholder="e.g. $50,000 in platform credits"
+                    placeholder="e.g. AED 185,000 in platform credits"
                     value={valueLabel}
                     onChange={(e) => setValueLabel(e.target.value)}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Estimated Value (USD) *</label>
+                  <label className="form-label">
+                    Estimated Value (AED) *
+                    <HelpTooltip text="Total estimated value in UAE Dirham (AED) for program valuation and analytics." />
+                  </label>
                   <input
                     type="number"
                     className="input"
                     required
-                    placeholder="e.g. 50000"
-                    value={usd}
-                    onChange={(e) => setUsd(Number(e.target.value))}
+                    placeholder="e.g. 185000"
+                    value={aed}
+                    onChange={(e) => handleAedChange(Number(e.target.value))}
                   />
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginTop: 10 }}>
                 <div className="form-group">
-                  <label className="form-label">Category *</label>
+                  <label className="form-label">
+                    Category *
+                    <HelpTooltip text="Primary business domain for directory filtering." />
+                  </label>
                   <select className="select" style={{ width: '100%' }} value={cat} onChange={(e) => setCat(e.target.value)}>
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>{c.name}</option>
@@ -292,7 +347,10 @@ export default function RegisterOfferModal({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Offer Type *</label>
+                  <label className="form-label">
+                    Offer Type *
+                    <HelpTooltip text="Specify whether this offer is Software, Advisory service, or Both." />
+                  </label>
                   <select className="select" style={{ width: '100%' }} value={type} onChange={(e) => setType(e.target.value as any)}>
                     {types.map((t) => (
                       <option key={t} value={t}>{t}</option>
@@ -301,7 +359,10 @@ export default function RegisterOfferModal({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Target Stage *</label>
+                  <label className="form-label">
+                    Target Stage *
+                    <HelpTooltip text="Startup maturity level best suited to redeem this perk." />
+                  </label>
                   <select className="select" style={{ width: '100%' }} value={lifecycle} onChange={(e) => setLifecycle(e.target.value)}>
                     {lifecycles.map((l) => (
                       <option key={l} value={l}>{l}</option>
@@ -313,12 +374,15 @@ export default function RegisterOfferModal({
 
             {/* Section 3: Perk Descriptions & Benefits */}
             <div className="reg-section">
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Sparkles size={14} /> 3. Perk Content & Eligibility
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Sparkles size={13} /> 3. Perk Content & Eligibility
               </div>
 
               <div className="form-group">
-                <label className="form-label">Short Summary (Visible on card) *</label>
+                <label className="form-label">
+                  Short Summary (Visible on Card) *
+                  <HelpTooltip text="1-2 concise sentences summarizing the value proposition." />
+                </label>
                 <input
                   className="input"
                   required
@@ -329,7 +393,10 @@ export default function RegisterOfferModal({
               </div>
 
               <div className="form-group" style={{ marginTop: 10 }}>
-                <label className="form-label">About the Offer & Partner *</label>
+                <label className="form-label">
+                  About the Offer & Solution *
+                  <HelpTooltip text="In-depth details shown in the Quick Claim Drawer." />
+                </label>
                 <textarea
                   className="textarea"
                   rows={2}
@@ -342,7 +409,10 @@ export default function RegisterOfferModal({
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 10 }}>
                 <div className="form-group">
-                  <label className="form-label">Why Founders Need This</label>
+                  <label className="form-label">
+                    Why Founders Need This
+                    <HelpTooltip text="Key ROI, cost-savings, or operational benefit." />
+                  </label>
                   <textarea
                     className="textarea"
                     rows={2}
@@ -353,11 +423,14 @@ export default function RegisterOfferModal({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Target Audience / Eligibility</label>
+                  <label className="form-label">
+                    Target Audience / Eligibility
+                    <HelpTooltip text="Prerequisites or funding limits (e.g. under $3M raised)." />
+                  </label>
                   <textarea
                     className="textarea"
                     rows={2}
-                    placeholder="e.g. Hub71 startups with under $3M raised..."
+                    placeholder="e.g. Hub71 startups with under $5M raised..."
                     value={whoFor}
                     onChange={(e) => setWhoFor(e.target.value)}
                   />
@@ -366,7 +439,10 @@ export default function RegisterOfferModal({
 
               {/* What's Included Bullets */}
               <div className="form-group" style={{ marginTop: 10 }}>
-                <label className="form-label">What's Included (Key Deliverables)</label>
+                <label className="form-label">
+                  What's Included (Key Deliverables)
+                  <HelpTooltip text="Bullet points outlining credits, duration, features, and support." />
+                </label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {included.map((inc, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -376,6 +452,7 @@ export default function RegisterOfferModal({
                         type="button"
                         onClick={() => handleRemoveIncluded(i)}
                         style={{ background: 'none', border: 'none', color: 'var(--text-faint)', cursor: 'pointer', padding: 2 }}
+                        aria-label="Remove item"
                       >
                         <Trash2 size={13} />
                       </button>
@@ -384,7 +461,7 @@ export default function RegisterOfferModal({
                   <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
                     <input
                       className="input"
-                      placeholder="Add benefit, e.g. 1 year free premium support..."
+                      placeholder="Add deliverable, e.g. 1 year free premium support..."
                       value={newInc}
                       onChange={(e) => setNewInc(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddIncluded(); } }}
@@ -402,7 +479,7 @@ export default function RegisterOfferModal({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '12px 14px',
+                  padding: '10px 14px',
                   borderRadius: 12,
                   background: 'var(--surface-2)',
                   border: '1px solid var(--border)',
@@ -414,8 +491,11 @@ export default function RegisterOfferModal({
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <Star size={16} fill={exclusive ? '#ff9500' : 'none'} color="#ff9500" />
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Exclusive to Hub71 Startups</div>
-                    <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Special negotiated terms for Abu Dhabi ecosystem founders</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      Exclusive to Hub71 Startups
+                      <HelpTooltip text="Marks the perk as a specially negotiated Hub71-only offer." />
+                    </div>
+                    <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Special negotiated terms for Abu Dhabi founders</div>
                   </div>
                 </div>
                 <span className={'switch' + (exclusive ? ' on' : '')} />
@@ -423,11 +503,11 @@ export default function RegisterOfferModal({
             </div>
 
             {/* Modal Actions */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, marginTop: 10, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, marginTop: 10, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
               <button type="button" className="btn btn-ghost" onClick={onClose}>
                 Cancel
               </button>
-              <button type="submit" className="cpc-claim-btn" style={{ height: 44, padding: '0 24px', fontSize: 13.5 }}>
+              <button type="submit" className="cpc-claim-btn" style={{ height: 42, padding: '0 22px', fontSize: 13 }}>
                 {submitted ? <CheckCircle2 size={16} /> : <ArrowRight size={15} />}
                 <span>{submitted ? 'Published to Hub71!' : 'Publish Partner Offer'}</span>
               </button>
@@ -435,7 +515,7 @@ export default function RegisterOfferModal({
           </form>
 
           {/* Right: Live Preview Panel */}
-          <div style={{ background: 'var(--surface-2)', borderLeft: '1px solid var(--border)', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ background: 'var(--surface-2)', borderLeft: '1px solid var(--border)', padding: '22px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.6px', display: 'flex', alignItems: 'center', gap: 6 }}>
               <Sparkles size={13} style={{ color: '#0066cc' }} /> Live Founder Directory Preview
             </div>
@@ -465,7 +545,7 @@ export default function RegisterOfferModal({
               </div>
 
               <div className="cpc-value-row">
-                <span className="cpc-value">{valueLabel || '$0 in credits'}</span>
+                <span className="cpc-value">{valueLabel || `AED ${(aed || 0).toLocaleString()}`}</span>
               </div>
 
               <p className="cpc-desc">{short || 'Short perk description will appear here...'}</p>
@@ -485,7 +565,7 @@ export default function RegisterOfferModal({
               <div style={{ fontWeight: 700, color: 'var(--text)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <ShieldCheck size={14} style={{ color: '#0066cc' }} /> Hub71 Verification Protocol
               </div>
-              Once registered, this perk offer is instantly live across the Founder Directory, Hub71 Admin Intelligence, and Partner Portal.
+              All registered offers are recorded in AED currency and automatically published across the Founder Directory, Admin Intelligence, and Partner Portal.
             </div>
           </div>
         </div>

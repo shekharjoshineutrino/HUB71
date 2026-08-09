@@ -380,6 +380,34 @@ button { font-family: inherit; cursor: pointer; }
 .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 .switch.on::after { left: 18px; }
 
+/* ---------- Help Tooltip & Popover ---------- */
+.help-tip-wrap {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  margin-left: 6px; vertical-align: middle; cursor: pointer;
+}
+.help-tip-btn {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--surface-2); color: var(--text-faint);
+  border: 1px solid var(--border); font-size: 10px; font-weight: 800;
+  display: inline-grid; place-items: center; line-height: 1; transition: all 0.15s ease;
+}
+.help-tip-wrap:hover .help-tip-btn {
+  background: #0066cc; color: #ffffff; border-color: #0066cc;
+}
+.help-tip-popover {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: var(--surface); color: var(--text); font-size: 11.5px; font-weight: 500;
+  padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: max-content; max-width: 240px;
+  z-index: 1500; pointer-events: none; line-height: 1.45; text-transform: none; letter-spacing: normal;
+  animation: vizFadeIn 0.15s ease;
+}
+.help-tip-popover::after {
+  content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border-width: 5px; border-style: solid;
+  border-color: var(--border) transparent transparent transparent;
+}
+
 /* ---------- Unified Apple-Style Control Deck ---------- */
 .control-deck {
   padding: 14px 18px; border-radius: 20px; background: var(--surface);
