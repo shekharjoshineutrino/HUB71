@@ -320,12 +320,86 @@ button { font-family: inherit; cursor: pointer; }
 
 .filter-rail { position: sticky; top: 88px; padding: 0 0 10px; overflow: hidden; border-radius: 20px; }
 .filter-rail.drawer-mode {
-  position: fixed; top: 0; right: 0; bottom: 0; width: 350px; z-index: 1000;
+  position: fixed; top: 0; right: 0; bottom: 0; width: 380px; max-width: 90vw; z-index: 1200;
   border-radius: 24px 0 0 24px; border-right: none; background: var(--surface);
-  box-shadow: -10px 0 40px rgba(0,0,0,0.2); transform: translateX(100%);
-  transition: transform 0.26s cubic-bezier(0.2, 0.7, 0.3, 1); display: flex; flex-direction: column;
+  box-shadow: -10px 0 40px rgba(0,0,0,0.25); transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1); display: flex; flex-direction: column;
 }
 .filter-rail.drawer-mode.open { transform: translateX(0); }
+
+/* Sliding Drawer Overlay & Panel (Quick Claim & Modals) */
+.drawer-overlay {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(4px);
+  z-index: 1100; animation: vizFadeIn 0.2s ease;
+}
+.drawer-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 440px; max-width: 90vw;
+  background: var(--surface); z-index: 1200; border-radius: 24px 0 0 24px;
+  box-shadow: -10px 0 40px rgba(0,0,0,0.25); display: flex; flex-direction: column;
+  animation: slideInRight 0.28s cubic-bezier(0.2, 0.7, 0.3, 1); overflow: hidden;
+}
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.drawer-head {
+  display: flex; align-items: center; gap: 14px; padding: 18px 22px;
+  border-bottom: 1px solid var(--border); background: var(--surface-2); flex-shrink: 0;
+}
+.drawer-title { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; margin: 0; }
+.drawer-body {
+  flex: 1; overflow-y: auto; padding: 22px; display: flex; flex-direction: column; gap: 20px;
+}
+.drawer-banner {
+  padding: 20px; border-radius: 16px; color: #ffffff;
+  display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.db-value { font-family: var(--font-disp, 'Inter', sans-serif); font-size: 20px; font-weight: 800; }
+.db-desc { font-size: 12.5px; opacity: 0.9; line-height: 1.4; }
+
+/* Admin Applications Review Styles */
+.app-review-card {
+  padding: 20px 24px; border-radius: 18px; background: var(--surface);
+  border: 1px solid var(--border); transition: all 0.2s ease;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+}
+.app-review-card:hover {
+  border-color: #0066cc; box-shadow: 0 6px 20px rgba(0, 102, 204, 0.08); transform: translateY(-2px);
+}
+.app-brand-box {
+  display: flex; align-items: center; gap: 16px; min-width: 0; flex: 1;
+}
+.app-avatar {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: grid; place-items: center; flex-shrink: 0;
+  font-weight: 800; font-size: 16px; border: 1px solid var(--border);
+}
+.app-info {
+  display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1;
+}
+.app-title-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.app-company-name {
+  font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; margin: 0;
+}
+.app-cat-tag {
+  font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+  background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border);
+}
+.app-note {
+  font-size: 13px; color: var(--text-muted); line-height: 1.45; margin: 0;
+}
+.app-meta-row {
+  display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-faint); margin-top: 4px;
+}
+.app-meta-item {
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.app-action-group {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
 
 .drawer-body-scroll {
   scrollbar-width: thin; scrollbar-color: var(--border) transparent;

@@ -147,8 +147,8 @@ export default function Browse() {
       {/* On-Demand Slide-Out Filter Drawer Scrim */}
       {fOpen && <div className="frail-scrim" onClick={() => setFOpen(false)} />}
 
-      {/* StartupStack Hub71 Filter Drawer */}
-      <aside className={'card filter-rail drawer-mode' + (fOpen ? ' open' : '')} style={{ width: 330 }}>
+      {/* StartupStack Hub71 Filter Drawer on the Right */}
+      <aside className={'card filter-rail drawer-mode' + (fOpen ? ' open' : '')}>
         <div className="frail-head">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <SlidersHorizontal size={15} style={{ color: '#0066cc' }} />
