@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Search, SlidersHorizontal, Plus, MoreVertical, ArrowDown, Download } from 'lucide-react'
 import { offers, categoryById } from '../data'
 import { partnerIcon } from '../icons'
@@ -34,7 +35,9 @@ export default function AdminPartners() {
             </div>
             <button className="btn btn-ghost btn-sm"><SlidersHorizontal size={14} /> Filters</button>
             <button className="btn btn-ghost btn-sm"><Download size={14} /> Export</button>
-            <button className="btn btn-primary btn-sm"><Plus size={14} /> Add partner</button>
+            <Link to="/admin/register-offer" className="btn btn-primary btn-sm" style={{ textDecoration: 'none' }}>
+              <Plus size={14} /> Add partner
+            </Link>
           </div>
         </div>
 
