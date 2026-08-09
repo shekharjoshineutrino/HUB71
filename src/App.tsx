@@ -10,6 +10,7 @@ import Admin from './pages/Admin'
 import AdminApplications from './pages/AdminApplications'
 import AdminPartners from './pages/AdminPartners'
 import AdminSettings from './pages/AdminSettings'
+import RegisterOfferPage from './pages/RegisterOfferPage'
 import CommandBar from './CommandBar'
 import { applications, currentUser, currentPartner, categoryById } from './data'
 
@@ -32,7 +33,11 @@ const ADMIN_UTIL = [
   { to: '/admin/settings', icon: Settings2, label: 'Settings', end: false, badge: '' },
 ]
 const ADMIN_TITLES: Record<string, string> = {
-  '/admin': 'Dashboard', '/admin/applications': 'Applications', '/admin/partners': 'Partners', '/admin/settings': 'Settings',
+  '/admin': 'Dashboard',
+  '/admin/register-offer': 'Register Partner Offer',
+  '/admin/applications': 'Applications',
+  '/admin/partners': 'Partners',
+  '/admin/settings': 'Settings',
 }
 
 function ThemeToggle() {
@@ -240,7 +245,9 @@ function Shell() {
             <Route path="/founder" element={<Browse />} />
             <Route path="/founder/offer/:offerId" element={<Offer />} />
             <Route path="/partner" element={<Partner />} />
+            <Route path="/partner/register-offer" element={<RegisterOfferPage />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/register-offer" element={<RegisterOfferPage />} />
             <Route path="/admin/applications" element={<AdminApplications />} />
             <Route path="/admin/partners" element={<AdminPartners />} />
             <Route path="/admin/settings" element={<AdminSettings />} />

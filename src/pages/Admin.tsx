@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Eye, MousePointerClick, MessageSquare, Wallet, Bell, AreaChart as AreaIco, LineChart as LineIco, BarChart3, PieChart as PieIco, Donut, TrendingUp, PieChart as PieHead, Trophy, Table2, CheckCircle2, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import {
   ComposedChart, Area, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -8,7 +9,6 @@ import { useTheme, chartColors, stillMode } from '../theme'
 import { partnerIcon } from '../icons'
 import { VizTooltip, SliceTooltip, VizLegend } from '../ChartBits'
 import { monthly, offers, categories, categoryById, kpis, fmt, currentUser } from '../data'
-import RegisterOfferModal from '../RegisterOfferModal'
 
 type Trend = 'area' | 'line' | 'bar'
 type CatView = 'bars' | 'donut' | 'pie'
@@ -63,7 +63,6 @@ export default function Admin() {
   const [catView, setCatView] = useState<CatView>((params.get('catview') as CatView) || 'bars')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(6)
-  const [regModalOpen, setRegModalOpen] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 
   const filtered = useMemo(
@@ -100,27 +99,19 @@ export default function Admin() {
           <p className="greet-sub">Here's how offer views, clicks, and founder queries are performing.</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button
+          <Link
+            to="/admin/register-offer"
             className="cpc-claim-btn"
-            onClick={() => setRegModalOpen(true)}
-            style={{ height: 38, padding: '0 16px', fontSize: 13, gap: 6 }}
+            style={{ height: 38, padding: '0 16px', fontSize: 13, gap: 6, textDecoration: 'none' }}
           >
             <Plus size={15} /> Register Partner Offer
-          </button>
+          </Link>
           <button className="icon-btn" style={{ position: 'relative' }} aria-label="Notifications">
             <Bell size={18} />
             <span className="notif-dot" />
           </button>
         </div>
       </div>
-
-      {/* Offer Registration Modal */}
-      <RegisterOfferModal
-        isOpen={regModalOpen}
-        onClose={() => setRegModalOpen(false)}
-        isAdmin={true}
-        onSuccess={() => setRefreshKey((k) => k + 1)}
-      />
 
       <div className="admin-filters" style={{ marginBottom: 16 }}>
         <select className="select" value={partner} onChange={(e) => setPartner(e.target.value)}>

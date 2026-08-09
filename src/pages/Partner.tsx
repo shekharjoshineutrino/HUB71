@@ -1,11 +1,11 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Eye, MousePointerClick, MessageSquare, AreaChart as AreaIco, LineChart as LineIco, BarChart3, Globe, Mail, CalendarDays, UserRound, TrendingUp, Inbox, SlidersHorizontal, Download, CheckCircle2, MoreVertical, Plus } from 'lucide-react'
 import { ComposedChart, Area, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useTheme, chartColors, stillMode } from '../theme'
 import { partnerMonthly, partnerRedemptions, currentPartner, categoryById, offerById, offers } from '../data'
 import { partnerIcon } from '../icons'
 import { VizTooltip, VizLegend } from '../ChartBits'
-import RegisterOfferModal from '../RegisterOfferModal'
 
 type Trend = 'area' | 'line' | 'bar'
 
@@ -29,8 +29,6 @@ export default function Partner() {
   const still = stillMode()
   const anim = { isAnimationActive: !still, animationDuration: 750, animationEasing: 'ease-out' as const }
   const [trend, setTrend] = useState<Trend>('area')
-  const [regModalOpen, setRegModalOpen] = useState(false)
-  const [refreshKey, setRefreshKey] = useState(0)
 
   const opts: { v: Trend; label: string; Icon: any }[] = [
     { v: 'area', label: 'Area', Icon: AreaIco },
@@ -70,24 +68,15 @@ export default function Partner() {
             <div className="ph-div" />
             <div className="ph-stat"><span className="ph-k">Offer value</span><span className="ph-v" style={{ color: pcg }}>{p.valueLabel}</span></div>
           </div>
-          <button
+          <Link
+            to="/partner/register-offer"
             className="cpc-claim-btn"
-            onClick={() => setRegModalOpen(true)}
-            style={{ height: 36, padding: '0 16px', fontSize: 12.5, gap: 6 }}
+            style={{ height: 36, padding: '0 16px', fontSize: 12.5, gap: 6, textDecoration: 'none' }}
           >
             <Plus size={14} /> Submit New Perk Offer
-          </button>
+          </Link>
         </div>
       </div>
-
-      {/* Offer Registration Modal for Partner */}
-      <RegisterOfferModal
-        isOpen={regModalOpen}
-        onClose={() => setRegModalOpen(false)}
-        isAdmin={false}
-        partnerName={p.name}
-        onSuccess={() => setRefreshKey((k) => k + 1)}
-      />
 
       <div className="grid metrics section-gap">
         <Metric tone={TONES[0]} icon={<Eye size={18} />} label="Offer views (30d)" value="214" delta="+20%" />
