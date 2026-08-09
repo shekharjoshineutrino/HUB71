@@ -37,7 +37,11 @@ export default function PerkCard({
       <div className="cpc-header">
         <div className="cpc-brand">
           <div className="cpc-logo">
-            <Icon size={20} />
+            {o.logoUrl ? (
+              <img src={o.logoUrl} alt={o.partner} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 8 }} />
+            ) : (
+              <Icon size={20} />
+            )}
           </div>
           <div className="cpc-meta">
             <h3 className="cpc-title">

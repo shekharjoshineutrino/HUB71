@@ -6,7 +6,10 @@ import {
 } from 'lucide-react'
 
 export const CAT_ICON: Record<string, any> = {
-  code: Code2, trending: TrendingUp, users: Users, scale: Scale, settings: Settings2, server: Server,
+  code: Code2, dev: Code2, trending: TrendingUp, marketing: Megaphone, sales: TrendingUp,
+  users: Users, hr: Users, scale: Scale, finance: Wallet, settings: Settings2, ops: Settings2,
+  server: Server, infra: Server, cloud: Cloud, ai: Sparkles, product: Target, support: MessageSquare,
+  security: Shield,
 }
 
 export const RTYPE_ICON: Record<string, any> = { zap: Zap, calendar: Calendar, send: Send }

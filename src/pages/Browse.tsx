@@ -69,7 +69,7 @@ export default function Browse() {
   const list = useMemo(() => {
     let out = offers.filter((o) => {
       if (cats.length && !cats.includes(o.cat)) return false
-      if (band && bandOf(o.usd) !== band) return false
+      if (band && bandOf(o.valueAED) !== band) return false
       if (type && o.type !== type) return false
       if (stage && o.lifecycle !== stage) return false
       if (exclusive && !o.exclusive) return false
@@ -78,13 +78,13 @@ export default function Browse() {
       return true
     })
     if (sort === 'Most viewed') out = [...out].sort((a, b) => b.views - a.views)
-    if (sort === 'Highest value') out = [...out].sort((a, b) => b.usd - a.usd)
+    if (sort === 'Highest value') out = [...out].sort((a, b) => b.valueAED - a.valueAED)
     if (sort === 'A – Z') out = [...out].sort((a, b) => a.partner.localeCompare(b.partner))
     return out
   }, [q, cats, band, type, stage, exclusive, savedOnly, savedIds, sort])
 
   const stackedOffers = useMemo(() => offers.filter((o) => stackIds.includes(o.id)), [stackIds])
-  const totalStackUSD = useMemo(() => stackedOffers.reduce((sum, o) => sum + o.usd, 0), [stackedOffers])
+  const totalStackAED = useMemo(() => stackedOffers.reduce((sum, o) => sum + o.valueAED, 0), [stackedOffers])
 
   const chips: { label: string; clear: () => void }[] = []
   if (q) chips.push({ label: `"${q}"`, clear: () => setQ('') })
