@@ -18,6 +18,8 @@ import {
   Plus,
   CheckCircle2,
   Zap,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react'
 import { categories, categoryById, valueBands, types, lifecycles, sorts, bandOf, offers, Offer } from '../data'
 import PerkCard from '../PerkCard'
@@ -49,9 +51,11 @@ function PillGroup({ title, icon: Icon, options, value, onChange }: { title: str
 export default function Browse() {
   const [q, setQ] = useState('')
   const [cats, setCats] = useState<string[]>([])
+  const [subcats, setSubcats] = useState<string[]>([])
+  const [openCats, setOpenCats] = useState<string[]>(['accounting', 'cloud'])
   const [band, setBand] = useState('')
   const [type, setType] = useState('')
-  const [stage, setStage] = useState('')
+  const [stages, setStages] = useState<string[]>([])
   const [exclusive, setExclusive] = useState(false)
   const [savedOnly, setSavedOnly] = useState(false)
   const [savedIds, setSavedIds] = useState<string[]>(['gcloud', 'aws'])
@@ -63,25 +67,41 @@ export default function Browse() {
   const [stackDrawerOpen, setStackDrawerOpen] = useState(false)
 
   const toggleCat = (id: string) => setCats((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
+  const toggleStage = (s: string) => setStages((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]))
+  const toggleSubcat = (sub: string, parentCatId: string) => {
+    setSubcats((prev) => {
+      const next = prev.includes(sub) ? prev.filter((x) => x !== sub) : [...prev, sub]
+      return next
+    })
+    // Auto add parent category if not present
+    if (!cats.includes(parentCatId) && !subcats.includes(sub)) {
+      setCats((c) => [...c, parentCatId])
+    }
+  }
+  const toggleCatAccordion = (catId: string) => {
+    setOpenCats((prev) => (prev.includes(catId) ? prev.filter((x) => x !== catId) : [...prev, catId]))
+  }
+
   const toggleSave = (id: string) => setSavedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   const toggleStack = (id: string) => setStackIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
 
   const list = useMemo(() => {
     let out = offers.filter((o) => {
       if (cats.length && !cats.includes(o.cat)) return false
+      if (subcats.length && (!o.subcat || !subcats.includes(o.subcat))) return false
+      if (stages.length && !stages.includes(o.lifecycle)) return false
       if (band && bandOf(o.valueAED) !== band) return false
       if (type && o.type !== type) return false
-      if (stage && o.lifecycle !== stage) return false
       if (exclusive && !o.exclusive) return false
       if (savedOnly && !savedIds.includes(o.id)) return false
-      if (q && !(o.partner + ' ' + o.short + ' ' + o.valueLabel).toLowerCase().includes(q.toLowerCase())) return false
+      if (q && !(o.partner + ' ' + o.short + ' ' + (o.subcat || '') + ' ' + o.valueLabel).toLowerCase().includes(q.toLowerCase())) return false
       return true
     })
     if (sort === 'Most viewed') out = [...out].sort((a, b) => b.views - a.views)
     if (sort === 'Highest value') out = [...out].sort((a, b) => b.valueAED - a.valueAED)
     if (sort === 'A – Z') out = [...out].sort((a, b) => a.partner.localeCompare(b.partner))
     return out
-  }, [q, cats, band, type, stage, exclusive, savedOnly, savedIds, sort])
+  }, [q, cats, subcats, stages, band, type, exclusive, savedOnly, savedIds, sort])
 
   const stackedOffers = useMemo(() => offers.filter((o) => stackIds.includes(o.id)), [stackIds])
   const totalStackAED = useMemo(() => stackedOffers.reduce((sum, o) => sum + o.valueAED, 0), [stackedOffers])
@@ -89,18 +109,20 @@ export default function Browse() {
   const chips: { label: string; clear: () => void }[] = []
   if (q) chips.push({ label: `"${q}"`, clear: () => setQ('') })
   cats.forEach((c) => chips.push({ label: categoryById(c)?.name || c, clear: () => toggleCat(c) }))
+  subcats.forEach((sub) => chips.push({ label: sub, clear: () => setSubcats((s) => s.filter((x) => x !== sub)) }))
+  stages.forEach((st) => chips.push({ label: st, clear: () => toggleStage(st) }))
   if (band) chips.push({ label: band, clear: () => setBand('') })
   if (type) chips.push({ label: type, clear: () => setType('') })
-  if (stage) chips.push({ label: stage, clear: () => setStage('') })
-  if (exclusive) chips.push({ label: 'Hub71 exclusive', clear: () => setExclusive(false) })
+  if (exclusive) chips.push({ label: 'Exclusive to Hub71', clear: () => setExclusive(false) })
   if (savedOnly) chips.push({ label: 'Saved perks only', clear: () => setSavedOnly(false) })
 
   const clearAll = () => {
     setQ('')
     setCats([])
+    setSubcats([])
+    setStages([])
     setBand('')
     setType('')
-    setStage('')
     setExclusive(false)
     setSavedOnly(false)
   }
@@ -125,12 +147,12 @@ export default function Browse() {
       {/* On-Demand Slide-Out Filter Drawer Scrim */}
       {fOpen && <div className="frail-scrim" onClick={() => setFOpen(false)} />}
 
-      {/* Side Sliding Bar for Filter Criteria */}
-      <aside className={'card filter-rail drawer-mode' + (fOpen ? ' open' : '')}>
+      {/* StartupStack Hub71 Filter Drawer */}
+      <aside className={'card filter-rail drawer-mode' + (fOpen ? ' open' : '')} style={{ width: 330 }}>
         <div className="frail-head">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <SlidersHorizontal size={15} style={{ color: '#0066cc' }} />
-            <span className="frail-title">Filter Criteria</span>
+            <span className="frail-title">Filters</span>
             {chips.length > 0 && <span className="deck-badge">{chips.length}</span>}
           </div>
 
@@ -146,68 +168,107 @@ export default function Browse() {
           </div>
         </div>
 
-        <div className="drawer-body-scroll" style={{ overflowY: 'auto', flex: 1, padding: '10px 0' }}>
-          {/* Category Filter Pills */}
-          <div className="filter-sec">
-            <div className="filter-h"><LayoutGrid size={13} /> Category</div>
-            <div className="fpills">
-              <button
-                className={'fpill' + (cats.length === 0 ? ' on' : '')}
-                onClick={() => setCats([])}
-              >
-                All ({offers.length})
-              </button>
-              {categories.map((c) => {
-                const on = cats.includes(c.id)
-                const count = offers.filter((o) => o.cat === c.id).length
+        <div className="drawer-body-scroll" style={{ overflowY: 'auto', flex: 1, padding: '0' }}>
+          {/* 1. Distribution */}
+          <div className="ss-filter-sec">
+            <div className="ss-filter-title">Distribution</div>
+            <div
+              className={'ss-check-item' + (exclusive ? ' checked' : '')}
+              onClick={() => setExclusive(!exclusive)}
+            >
+              <div className="ss-checkbox">
+                {exclusive && <Check size={12} />}
+              </div>
+              <span>Exclusive to Hub71</span>
+            </div>
+          </div>
+
+          {/* 2. Lifecycle Stages */}
+          <div className="ss-filter-sec">
+            <div className="ss-filter-title">Lifecycle Stages</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {lifecycles.map((st) => {
+                const checked = stages.includes(st)
                 return (
-                  <button
-                    key={c.id}
-                    className={'fpill' + (on ? ' on' : '')}
-                    onClick={() => toggleCat(c.id)}
+                  <div
+                    key={st}
+                    className={'ss-check-item' + (checked ? ' checked' : '')}
+                    onClick={() => toggleStage(st)}
                   >
-                    {c.name} <span style={{ opacity: 0.75, fontSize: 10.5 }}>{count}</span>
-                  </button>
+                    <div className="ss-checkbox">
+                      {checked && <Check size={12} />}
+                    </div>
+                    <span>{st}</span>
+                  </div>
                 )
               })}
             </div>
           </div>
 
-          {/* Offer Value Filter */}
-          <PillGroup title="Offer value" icon={BadgeDollarSign} options={valueBands} value={band} onChange={setBand} />
+          {/* 3. Categories & Subcategories (Accordion) */}
+          <div className="ss-filter-sec">
+            <div className="ss-filter-title">Categories</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {categories.map((c) => {
+                const isOpen = openCats.includes(c.id)
+                const hasActiveSub = c.subcategories.some((sub) => subcats.includes(sub))
+                const isCatActive = cats.includes(c.id)
+                return (
+                  <div key={c.id}>
+                    <div
+                      className="ss-cat-accordion-head"
+                      onClick={() => toggleCatAccordion(c.id)}
+                    >
+                      <div className="ss-cat-accordion-title">
+                        {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        <span style={{ fontWeight: hasActiveSub || isCatActive ? 800 : 600 }}>{c.name}</span>
+                      </div>
+                      {(hasActiveSub || isCatActive) && (
+                        <Check size={14} style={{ color: '#0066cc' }} />
+                      )}
+                    </div>
 
-          {/* Perk Type Filter */}
-          <PillGroup title="Perk Type" icon={Layers} options={types} value={type} onChange={setType} />
-
-          {/* Startup Stage Filter */}
-          <PillGroup title="Startup Stage" icon={Rocket} options={lifecycles} value={stage} onChange={setStage} />
-
-          {/* Hub71 Exclusive Toggle Card */}
-          <div className="filter-sec">
-            <div
-              className="excl-card"
-              onClick={() => setExclusive((v) => !v)}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                <div className="excl-star-box">
-                  <Star size={14} fill={exclusive ? '#ff9500' : 'none'} color="#ff9500" />
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Hub71 Exclusives</div>
-                  <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Special perks for Hub71 founders</div>
-                </div>
-              </div>
-              <span className={'switch' + (exclusive ? ' on' : '')} />
+                    {isOpen && (
+                      <div className="ss-cat-sublist">
+                        {c.subcategories.map((sub) => {
+                          const checked = subcats.includes(sub)
+                          return (
+                            <div
+                              key={sub}
+                              className={'ss-check-item' + (checked ? ' checked' : '')}
+                              onClick={() => toggleSubcat(sub, c.id)}
+                            >
+                              <div className="ss-checkbox">
+                                {checked && <Check size={12} />}
+                              </div>
+                              <span>{sub}</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
+
+          {/* 4. Offer Value (AED) */}
+          <PillGroup title="Offer Value" icon={BadgeDollarSign} options={valueBands} value={band} onChange={setBand} />
+
+          {/* 5. Perk Type */}
+          <PillGroup title="Perk Type" icon={Layers} options={types} value={type} onChange={setType} />
         </div>
 
-        {/* Side Sliding Bar Footer */}
-        <div className="drawer-footer">
+        {/* StartupStack Hub71 Filter Drawer Footer */}
+        <div className="drawer-footer" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button className="ss-reset-btn" onClick={clearAll}>
+            <X size={15} /> Reset filters
+          </button>
           <button
             className="cpc-claim-btn"
             onClick={() => setFOpen(false)}
-            style={{ width: '100%', height: 44, justifyContent: 'center', fontSize: 13.5, fontWeight: 700 }}
+            style={{ width: '100%', height: 42, justifyContent: 'center', fontSize: 13.5, fontWeight: 700 }}
           >
             Show {list.length} Offers <ArrowRight size={14} />
           </button>

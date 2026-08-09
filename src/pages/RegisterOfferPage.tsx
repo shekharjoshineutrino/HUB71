@@ -51,6 +51,7 @@ export default function RegisterOfferPage() {
   const [valueLabel, setValueLabel] = useState('AED 185,000 in platform credits')
   const [aed, setAed] = useState(185000)
   const [cat, setCat] = useState('ai')
+  const [subcat, setSubcat] = useState('Generative AI & LLMs')
   const [type, setType] = useState<'Software' | 'Service' | 'Both'>('Software')
   const [lifecycle, setLifecycle] = useState('Product')
 
@@ -124,6 +125,7 @@ export default function RegisterOfferPage() {
       partner: partner || 'New Partner',
       initials,
       cat,
+      subcat,
       type,
       lifecycle,
       usd,
@@ -441,19 +443,50 @@ export default function RegisterOfferPage() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18, marginTop: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginTop: 20 }}>
             <div className="form-group">
               <label className="form-label" style={{ fontSize: 13, marginBottom: 6 }}>
                 Primary Category *
-                <HelpTooltip text="Primary business domain for directory filtering." />
+                <HelpTooltip text="Primary business domain matching Hub71 StartupStack categories." />
               </label>
-              <select className="select" style={{ width: '100%', height: 42, fontSize: 13.5 }} value={cat} onChange={(e) => setCat(e.target.value)}>
+              <select
+                className="select"
+                style={{ width: '100%', height: 42, fontSize: 13.5 }}
+                value={cat}
+                onChange={(e) => {
+                  const newCat = e.target.value
+                  setCat(newCat)
+                  const targetCat = categories.find((c) => c.id === newCat)
+                  if (targetCat && targetCat.subcategories.length > 0) {
+                    setSubcat(targetCat.subcategories[0])
+                  }
+                }}
+              >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
 
+            <div className="form-group">
+              <label className="form-label" style={{ fontSize: 13, marginBottom: 6 }}>
+                Specific Subcategory *
+                <HelpTooltip text="Granular category specialization (e.g. Banking, Cloud Computing, Generative AI)." />
+              </label>
+              <select
+                className="select"
+                style={{ width: '100%', height: 42, fontSize: 13.5 }}
+                value={subcat}
+                onChange={(e) => setSubcat(e.target.value)}
+              >
+                {(categories.find((c) => c.id === cat)?.subcategories || []).map((sub) => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginTop: 16 }}>
             <div className="form-group">
               <label className="form-label" style={{ fontSize: 13, marginBottom: 6 }}>
                 Offer Type *
@@ -468,8 +501,8 @@ export default function RegisterOfferPage() {
 
             <div className="form-group">
               <label className="form-label" style={{ fontSize: 13, marginBottom: 6 }}>
-                Target Stage *
-                <HelpTooltip text="Startup maturity level best suited to redeem this perk." />
+                Lifecycle Stage *
+                <HelpTooltip text="Startup maturity stage: Vision, Product, Standardization, Go-to-Market, Growth, Optimization, Exit." />
               </label>
               <select className="select" style={{ width: '100%', height: 42, fontSize: 13.5 }} value={lifecycle} onChange={(e) => setLifecycle(e.target.value)}>
                 {lifecycles.map((l) => (
