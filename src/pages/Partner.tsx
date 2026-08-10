@@ -37,15 +37,35 @@ export default function Partner() {
   ]
 
   const p = currentPartner
-  const pcat = categoryById(p.cat)
-  const pcg = pcat?.g1 || '#2260e6'
+  const pcat = categoryById(p.cat) || categoryById('cloud')
+  const pcg = pcat?.g1 || '#0284c7'
+  const g2 = pcat?.g2 || '#38bdf8'
+  const offer = offerById(p.id)
+  const Icon = partnerIcon(offer?.icon || (p as any).icon || 'cloud')
 
   return (
     <>
       <div className="card partner-hero">
         <div className="ph-main">
-          <div className="avatar xl" style={{ background: `linear-gradient(135deg, ${pcat?.g1}, ${pcat?.g2})`, color: '#fff', boxShadow: `0 8px 20px ${pcg}44` }}>
-            {(() => { const I = partnerIcon(offerById(p.id)?.icon); return <I size={26} /> })()}
+          <div
+            className="avatar xl"
+            style={{
+              background: `linear-gradient(135deg, ${pcg}, ${g2})`,
+              color: '#ffffff',
+              boxShadow: `0 8px 20px color-mix(in srgb, ${pcg} 30%, transparent)`,
+              display: 'grid',
+              placeItems: 'center',
+              width: 64,
+              height: 64,
+              borderRadius: 18,
+              flexShrink: 0,
+            }}
+          >
+            {offer?.logoUrl ? (
+              <img src={offer.logoUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 8 }} />
+            ) : (
+              <Icon size={30} color="#ffffff" style={{ display: 'block' }} />
+            )}
           </div>
           <div style={{ minWidth: 0 }}>
             <div className="ph-top">

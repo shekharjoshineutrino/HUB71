@@ -294,10 +294,10 @@ export const partnerMonthly = [
 export type Application = { company: string; initials: string; cat: string; contact: string; date: string; note: string }
 export const applications: Application[] = [
   { company: 'Zoho', initials: 'Zo', cat: 'ops', contact: 'partnerships@zoho.com', date: 'Aug 5, 2026', note: 'Business suite — CRM, mail, and finance apps.' },
-  { company: 'Figma', initials: 'Fi', cat: 'build', contact: 'startups@figma.com', date: 'Aug 4, 2026', note: 'Design and prototyping platform for product teams.' },
-  { company: 'Twilio', initials: 'Tw', cat: 'infra', contact: 'startups@twilio.com', date: 'Aug 2, 2026', note: 'Communication APIs — SMS, voice, and email.' },
-  { company: 'Ramp', initials: 'Ra', cat: 'finance', contact: 'partners@ramp.com', date: 'Jul 31, 2026', note: 'Corporate cards and spend management.' },
-  { company: 'Webflow', initials: 'We', cat: 'growth', contact: 'startups@webflow.com', date: 'Jul 30, 2026', note: 'Visual website builder and CMS.' },
+  { company: 'Figma', initials: 'Fi', cat: 'product', contact: 'startups@figma.com', date: 'Aug 4, 2026', note: 'Design and prototyping platform for product teams.' },
+  { company: 'Twilio', initials: 'Tw', cat: 'dev', contact: 'startups@twilio.com', date: 'Aug 2, 2026', note: 'Communication APIs — SMS, voice, and email.' },
+  { company: 'Ramp', initials: 'Ra', cat: 'accounting', contact: 'partners@ramp.com', date: 'Jul 31, 2026', note: 'Corporate cards and spend management.' },
+  { company: 'Webflow', initials: 'We', cat: 'dev', contact: 'startups@webflow.com', date: 'Jul 30, 2026', note: 'Visual website builder and CMS.' },
 ]
 
 export const currentUser = { name: 'Alex Morgan', role: 'Programme Manager', email: 'alex.morgan@hub71.example', initials: 'AM' }
@@ -307,7 +307,8 @@ export const currentPartner = {
   id: 'gcp',
   name: 'Google Cloud',
   initials: 'GC',
-  cat: 'infra',
+  cat: 'cloud',
+  icon: 'cloud',
   tier: 'Premium partner',
   status: 'Active',
   since: 'Jan 2025',
@@ -315,7 +316,7 @@ export const currentPartner = {
   contact: 'partners@cloud.example',
   website: 'cloud.google.com/startup',
   offersLive: 1,
-  valueLabel: '$200,000 in credits',
+  valueLabel: 'AED 734,000 in credits',
 }
 
 export const cohortSize = 18
